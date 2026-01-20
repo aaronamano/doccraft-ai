@@ -378,7 +378,7 @@ class TemplateCreator:
         code_snippets = state.get("code_snippets", [])
         
         prompt = ChatPromptTemplate.from_template("""
-        Create a comprehensive markdown document for a coding agent based on the following content.
+        Create a comprehensive, detailed markdown document for a coding agent based on the following content.
         
         Content Type: {content_type}
         Source URL: {url}
@@ -389,28 +389,138 @@ class TemplateCreator:
         {code_snippets_section}
         
         Create a markdown document with these sections:
-        # [Title based on content]
+        # [Detailed Title based on content]
         
         ## Source Information
         - **URL**: {url}
         - **Content Type**: {content_type}
         - **Generated**: {timestamp}
+        - **Last Updated**: {timestamp}
         
-        ## Overview & Key Concepts
+        ## Executive Summary
+        - Brief overview of the main concepts
+        - Key takeaways for developers
+        - Prerequisites and requirements
+        - Target audience level
         
-        ## Best Practices & Guidelines
+        ## Core Concepts & Fundamentals
+        - Detailed explanation of main concepts
+        - Theoretical background where applicable
+        - Key terminology and definitions
+        - How concepts relate to each other
+        - Real-world use cases and scenarios
         
-        ## Code Examples & Patterns
+        ## Detailed Implementation Guide
+        - Step-by-step implementation process
+        - Configuration requirements
+        - Environment setup instructions
+        - Dependencies and version requirements
+        - Installation and setup procedures
+        
+        ## Comprehensive Best Practices & Guidelines
+        - Performance optimization techniques
+        - Security considerations and measures
+        - Error handling strategies
+        - Code organization and structure
+        - Testing and validation approaches
+        - Documentation standards
+        
+        ## Complete Code Examples & Patterns
         {code_examples_placeholder}
+        - Production-ready examples
+        - Common design patterns
+        - Integration examples with other tools/frameworks
+        - Full working implementations
+        - Code walkthroughs and explanations
         
-        ## Implementation Notes
+        ## DO's and DON'Ts - Critical Guidelines
+        ### ✅ DO's
+        - List of recommended practices and approaches
+        - Things you should always do
+        - Best practices to follow
+        - Recommended configurations and settings
+        - Proper error handling approaches
+        
+        ### ❌ DON'Ts
+        - Common mistakes to avoid
+        - Anti-patterns and problematic approaches
+        - Things you should never do
+        - Deprecated methods or practices
+        - Security vulnerabilities to avoid
+        
+        ## Advanced Techniques & Optimizations
+        - Performance tuning strategies
+        - Advanced usage patterns
+        - Scaling considerations
+        - Optimization tips and tricks
+        - Edge cases and how to handle them
+        
+        ## Troubleshooting & Debugging
+        - Common issues and their solutions
+        - Debugging techniques and tools
+        - Error message meanings and resolutions
+        - Performance bottlenecks and how to identify them
+        - Logging and monitoring recommendations
+        
+        ## Integration & Compatibility
+        - Integration with popular frameworks and libraries
+        - API compatibility considerations
+        - Database integration patterns
+        - Third-party service integrations
+        - Version compatibility matrix
+        
+        ## Testing Strategies
+        - Unit testing approaches and frameworks
+        - Integration testing strategies
+        - Performance testing methodologies
+        - Test-driven development (TDD) practices
+        - Continuous integration considerations
+        
+        ## Security Considerations
+        - Common security vulnerabilities
+        - Authentication and authorization patterns
+        - Data protection and encryption
+        - Secure coding practices
+        - Compliance and regulatory considerations
+        
+        ## Performance Metrics & Monitoring
+        - Key performance indicators (KPIs)
+        - Monitoring tools and techniques
+        - Performance benchmarking
+        - Resource utilization optimization
+        - Analytics and reporting
         
         ## Common Pitfalls & Solutions
+        - Frequently encountered problems
+        - Root cause analysis of common issues
+        - Preventive measures
+        - Recovery strategies
+        - Lessons learned from real-world deployments
+        
+        ## Frequently Asked Questions (FAQ)
+        - Common developer questions
+        - Clarification of confusing concepts
+        - Workarounds for known limitations
+        - Alternative approaches when primary methods fail
         
         ## Additional Resources & References
+        - Official documentation links
+        - Recommended books and tutorials
+        - Community forums and discussion groups
+        - Related tools and libraries
+        - Further reading and learning resources
+        - Video tutorials and courses
         
-        Format code blocks properly with language specification.
-        Make it practical and actionable for a coding agent.
+        ## Quick Reference Cheat Sheet
+        - Common commands and syntax
+        - Quick configuration snippets
+        - Frequently used code patterns
+        - Essential parameters and their meanings
+        
+        Make the content extremely detailed, practical, and actionable.
+        Include real-world examples, use cases, and scenario-based explanations.
+        Format all code blocks with proper language specification.
+        Ensure the content is comprehensive enough to serve as a complete reference guide.
         """)
         
         try:
@@ -474,7 +584,6 @@ class TemplateSaver:
                 f.write(state["markdown_content"])
             
             state["file_path"] = save_path
-            print(f"✅ Markdown file saved to: {save_path}")
             
         except Exception as e:
             state["error_message"] = f"Failed to save file: {str(e)}"
@@ -613,24 +722,14 @@ def main():
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     
     if not OPENAI_API_KEY:
-        print("⚠️  Please set OPENAI_API_KEY environment variable")
         OPENAI_API_KEY = input("Enter your OpenAI API key: ").strip()
     
     # Create the workflow
-    print("🔧 Creating workflow...")
     app = create_workflow(OPENAI_API_KEY)
     
-    # Get URL from user
-    print("\n🌐 Enter a URL (documentation, article, or video about coding best practices):")
-    print("   Examples:")
-    print("   - https://react.dev/learn")
-    print("   - https://www.youtube.com/watch?v=...")
-    print("   - https://docs.python.org/3/tutorial/")
-    
-    url = input("\nURL: ").strip()
+    url = input("URL: ").strip()
     
     if not url:
-        print("❌ No URL provided. Exiting.")
         return
     
     # Initial state
@@ -650,42 +749,14 @@ def main():
         metadata={}
     )
     
-    # Run the workflow
-    print(f"\n🚀 Processing: {url}")
-    print("=" * 50)
-    
     try:
         final_state = app.invoke(initial_state)
         
-        # Print results
-        print("\n" + "=" * 50)
-        print("📊 RESULTS:")
-        print("=" * 50)
-        
         if final_state.get("error_message"):
-            print(f"❌ Error: {final_state['error_message']}")
-        
-        if final_state.get("url_valid"):
-            print(f"✅ URL Valid: Yes")
-            print(f"📱 Media Type: {final_state.get('media_type', 'Unknown')}")
-            print(f"🎯 Content Relevant: {final_state.get('content_relevant', 'Unknown')}")
-            print(f"🏷️  Content Type: {final_state.get('content_type', 'Unknown')}")
-            
-            if final_state.get("file_path"):
-                print(f"💾 File Saved: {final_state['file_path']}")
-                print(f"📄 File Size: {os.path.getsize(final_state['file_path']) if os.path.exists(final_state['file_path']) else 0} bytes")
-            else:
-                print("❌ No file was saved")
-        else:
-            print(f"❌ URL Invalid: {final_state.get('error_message', 'Unknown error')}")
-        
-        # Show preview of generated content
-        if final_state.get("markdown_content"):
-            preview = final_state["markdown_content"][:500]
-            print(f"\n📝 Preview:\n{preview}...")
+            return
     
     except Exception as e:
-        print(f"💥 Workflow failed: {str(e)}")
+        pass
 
 if __name__ == "__main__":
     main()
