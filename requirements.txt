@@ -10,3 +10,6 @@ markdown
 pydantic
 python-dotenv
 langchain-openai
+fastapi
+uvicorn
+jinja2
