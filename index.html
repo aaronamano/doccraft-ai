@@ -3,136 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Code Context Crafter</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="url"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        input[type="url"]:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .loading {
-            text-align: center;
-            margin: 20px 0;
-            color: #666;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 5px;
-            margin: 20px 0;
-            border: 1px solid #f5c6cb;
-        }
-        .result {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #007bff;
-        }
-        .result h3 {
-            margin-top: 0;
-            color: #333;
-        }
         .result-content {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
             white-space: pre-wrap;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.5;
-            overflow-x: auto;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        .download-btn {
-            background-color: #28a745;
-            margin-top: 15px;
-        }
-        .download-btn:hover {
-            background-color: #218838;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Code Context Crafter</h1>
-        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+<body class="font-sans max-w-2xl mx-auto p-5 bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-lg">
+        <h1 class="text-gray-800 text-center mb-8 text-3xl font-bold">Code Context Crafter</h1>
+        <p class="text-center text-gray-600 mb-8">
             Extract coding best practices and documentation from URLs
         </p>
         
         <form id="urlForm">
-            <div class="form-group">
-                <label for="url">Enter URL:</label>
+            <div class="mb-5">
+                <label for="url" class="block mb-1.5 font-bold text-gray-700">Enter URL:</label>
                 <input type="url" id="url" name="url" required 
-                       placeholder="https://example.com/documentation or YouTube video URL">
+                       placeholder="https://example.com/documentation or YouTube video URL"
+                       class="w-full p-3 border-2 border-gray-300 rounded-lg text-base box-border focus:border-blue-500 focus:outline-none">
             </div>
-            <button type="submit" id="submitBtn">Extract Content</button>
+            <button type="submit" id="submitBtn" 
+                    class="w-full p-3 bg-blue-600 text-white border-none rounded-lg text-base cursor-pointer transition-colors duration-300 hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                Extract Content
+            </button>
         </form>
 
-        <div id="loading" class="loading" style="display: none;">
+        <div id="loading" class="text-center my-5 text-gray-600" style="display: none;">
             Processing content... Please wait.
         </div>
 
-        <div id="error" class="error" style="display: none;"></div>
+        <div id="error" class="bg-red-100 text-red-800 p-3 rounded-lg my-5 border border-red-200" style="display: none;"></div>
 
-        <div id="result" class="result" style="display: none;">
-            <h3>Generated Markdown:</h3>
-            <div id="resultContent" class="result-content"></div>
-            <button id="downloadBtn" class="download-btn" style="display: none;">Download Markdown File</button>
+        <div id="result" class="mt-8 p-5 bg-gray-50 rounded-lg border-l-4 border-blue-600" style="display: none;">
+            <h3 class="mt-0 text-gray-800 text-xl font-semibold">Generated Markdown:</h3>
+            <div id="resultContent" class="result-content bg-white p-4 rounded-lg overflow-x-auto max-h-96 overflow-y-auto"></div>
+            <button id="downloadBtn" class="download-btn w-full p-3 bg-green-600 text-white border-none rounded-lg text-base cursor-pointer transition-colors duration-300 hover:bg-green-700 mt-4" style="display: none;">Download Markdown File</button>
         </div>
     </div>
 
