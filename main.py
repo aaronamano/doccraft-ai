@@ -4,6 +4,9 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from agent import AgentState
+import os
+import re
+from datetime import datetime
 
 load_dotenv()
 
@@ -54,14 +57,36 @@ async def process_url(request: AgentRequest):
         if final_state.get("error_message"):
             raise HTTPException(status_code=400, detail=final_state.get("error_message"))
         
-        # Return markdown content only (file path no longer used)
+        # Create downloads directory if it doesn't exist
+        os.makedirs("downloads", exist_ok=True)
+        
+        # Generate filename from URL
+        safe_filename = re.sub(r'[^a-zA-Z0-9_-]', '_', request.url)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{safe_filename}_{timestamp}.md"
+        filepath = os.path.join("downloads", filename)
+        
+        # Save markdown content to file
+        markdown_content = final_state.get("markdown_content", "")
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+        
         return {
-            "markdown_content": final_state.get("markdown_content", "")
+            "markdown_content": markdown_content,
+            "file_path": filepath
         }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
+
+@app.get("/download/{filename}")
+async def download_file(filename: str):
+    filepath = os.path.join("downloads", filename)
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    return FileResponse(filepath, media_type='text/markdown', filename=filename)
 
 
 @app.get("/", response_class=HTMLResponse)

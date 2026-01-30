@@ -123,7 +123,7 @@ class ContentProcessor:
             raise ValueError("FIRECRAWL_API_KEY environment variable is required")
         
         self.llm = ChatOpenAI(
-            model="gpt-4",
+            model="gpt-5-nano",
             temperature=0,
             api_key=openai_api_key or os.getenv("OPENAI_API_KEY")
         )
