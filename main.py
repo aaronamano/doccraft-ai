@@ -57,23 +57,11 @@ async def process_url(request: AgentRequest):
         if final_state.get("error_message"):
             raise HTTPException(status_code=400, detail=final_state.get("error_message"))
         
-        # Create downloads directory if it doesn't exist
-        os.makedirs("downloads", exist_ok=True)
-        
-        # Generate filename from URL
-        safe_filename = re.sub(r'[^a-zA-Z0-9_-]', '_', request.url)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{safe_filename}_{timestamp}.md"
-        filepath = os.path.join("downloads", filename)
-        
-        # Save markdown content to file
+        # Get markdown content without saving to file
         markdown_content = final_state.get("markdown_content", "")
-        with open(filepath, "w", encoding="utf-8") as f:
-            f.write(markdown_content)
         
         return {
-            "markdown_content": markdown_content,
-            "file_path": filepath
+            "markdown_content": markdown_content
         }
         
     except Exception as e:
@@ -82,7 +70,12 @@ async def process_url(request: AgentRequest):
 
 @app.get("/download/{filename}")
 async def download_file(filename: str):
-    filepath = os.path.join("downloads", filename)
+    # Check if downloads directory exists, if not create it for manual file uploads
+    downloads_dir = "Downloads"
+    if not os.path.exists(downloads_dir):
+        os.makedirs(downloads_dir, exist_ok=True)
+    
+    filepath = os.path.join(downloads_dir, filename)
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="File not found")
     
